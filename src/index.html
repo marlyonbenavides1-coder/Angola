@@ -1,13 +1,414 @@
-<!doctype html>
-<html lang="en">
+<!DOCTYPE html>
+<html lang="es" class="h-full bg-slate-950 text-slate-100">
 <head>
-  <meta charset="utf-8">
-  <title>Fronted</title>
-  <base href="/">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Best Body - Gestión de clientes</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome Icons CDN -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(15, 23, 42, 0.6);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.75);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+    </style>
 </head>
-<body>
-  <app-root></app-root>
+<body class="h-full flex flex-col font-sans antialiased selection:bg-brand-500 selection:text-slate-900">
+
+    <!-- MAIN HEADER -->
+    <header class="border-b border-slate-800 bg-slate-900/90 backdrop-blur-md sticky top-0 z-30 shadow-md">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-400 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-brand-500/20">
+                    <i class="fa-solid fa-dumbbell"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-extrabold tracking-tight text-white flex items-center gap-2">
+                        Best Body
+                    </h1>
+                    <p class="text-xs text-slate-400">Panel de Administración del Gimnasio</p>
+                </div>
+            </div>
+
+            <div class="hidden sm:flex items-center gap-2 text-xs text-slate-400">
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+                <span>Sistema de Clientes</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN CONTENT CONTAINER -->
+    <main class="flex-1 max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col justify-center">
+
+        <section class="w-full">
+            <div class="glass-card rounded-2xl p-6 sm:p-8 shadow-2xl relative overflow-hidden border border-slate-800">
+                <!-- Top Accent Line -->
+                <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-brand-500 via-emerald-400 to-teal-500"></div>
+
+                <div class="flex items-center justify-between mb-6 pb-4 border-b border-slate-800">
+                    <div>
+                        <h2 id="form-title" class="text-xl font-bold text-white flex items-center gap-2">
+                            <i class="fa-solid fa-user-plus text-brand-500"></i>
+                            <span>Gestión de clientes</span>
+                        </h2>
+                        <p class="text-xs text-slate-400 mt-1">Completa o actualiza la información detallada del cliente para el gimnasio.</p>
+                    </div>
+                </div>
+
+                <!-- Toast Notification Box -->
+                <div id="toast" class="hidden mb-6 p-4 rounded-xl text-xs font-medium transition-all duration-300 flex items-center gap-2">
+                    <i id="toast-icon" class="fa-solid font-black text-sm"></i>
+                    <span id="toast-msg"></span>
+                </div>
+
+                <form id="client-form" class="space-y-5" onsubmit="handleFormSubmit(event)">
+                    <input type="hidden" id="client-id" value="">
+
+                    <!-- Nombre completo -->
+                    <div>
+                        <label for="fullName" class="block text-xs font-semibold text-slate-300 mb-1.5">Nombre completo <span class="text-rose-400">*</span></label>
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                                <i class="fa-regular fa-user text-xs"></i>
+                            </div>
+                            <input type="text" id="fullName" required placeholder="Ej: Juan Carlos Pérez" 
+                                class="w-full pl-9 pr-3 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
+                        </div>
+                    </div>
+
+                    <!-- Documento de identidad & Teléfono -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="idNumber" class="block text-xs font-semibold text-slate-300 mb-1.5">Documento de identidad (cédula) <span class="text-rose-400">*</span></label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                                    <i class="fa-regular fa-id-card text-xs"></i>
+                                </div>
+                                <input type="text" id="idNumber" required placeholder="Ej: 1098765432" 
+                                    class="w-full pl-9 pr-3 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="phone" class="block text-xs font-semibold text-slate-300 mb-1.5">Teléfono / Celular <span class="text-rose-400">*</span></label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                                    <i class="fa-solid fa-phone text-xs"></i>
+                                </div>
+                                <input type="tel" id="phone" required placeholder="Ej: 300 123 4567" 
+                                    class="w-full pl-9 pr-3 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Correo electrónico & Fecha de nacimiento -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="email" class="block text-xs font-semibold text-slate-300 mb-1.5">Correo electrónico</label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                                    <i class="fa-regular fa-envelope text-xs"></i>
+                                </div>
+                                <input type="email" id="email" placeholder="cliente@ejemplo.com" 
+                                    class="w-full pl-9 pr-3 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
+                            </div>
+                        </div>
+
+                        <div>
+                            <div class="flex justify-between items-center mb-1.5">
+                                <label for="birthDate" class="block text-xs font-semibold text-slate-300">Fecha de nacimiento <span class="text-rose-400">*</span></label>
+                                <span id="computed-age" class="text-[11px] font-bold text-brand-400 hidden bg-brand-500/10 px-2 py-0.5 rounded border border-brand-500/20">Edad: -- años</span>
+                            </div>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                                    <i class="fa-regular fa-calendar-days text-xs"></i>
+                                </div>
+                                <input type="date" id="birthDate" required onchange="calculateAge()" 
+                                    class="w-full pl-9 pr-3 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Plan / Membresía & Estado -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="plan" class="block text-xs font-semibold text-slate-300 mb-1.5">Plan / Membresía <span class="text-rose-400">*</span></label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                                    <i class="fa-solid fa-award text-xs"></i>
+                                </div>
+                                <select id="plan" required onchange="autoCalculateExpiry()" 
+                                    class="w-full pl-9 pr-3 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
+                                    <option value="" disabled selected>Selecciona un plan</option>
+                                    <option value="Día">Día (1 Día)</option>
+                                    <option value="Mensual">Mensual (1 Mes)</option>
+                                    <option value="Trimestral">Trimestral (3 Meses)</option>
+                                    <option value="Semestral">Semestral (6 Meses)</option>
+                                    <option value="Anual">Anual (1 Año)</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label for="status" class="block text-xs font-semibold text-slate-300 mb-1.5">Estado <span class="text-rose-400">*</span></label>
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
+                                    <i class="fa-solid fa-circle-dot text-xs"></i>
+                                </div>
+                                <select id="status" required 
+                                    class="w-full pl-9 pr-3 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
+                                    <option value="Activo">Activo</option>
+                                    <option value="Inactivo">Inactivo</option>
+                                    <option value="Vencido">Vencido</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fecha de inscripción & Fecha de vencimiento -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label for="startDate" class="block text-xs font-semibold text-slate-300 mb-1.5">Fecha de inscripción <span class="text-rose-400">*</span></label>
+                            <input type="date" id="startDate" required onchange="autoCalculateExpiry()" 
+                                class="w-full px-3 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
+                        </div>
+
+                        <div>
+                            <label for="endDate" class="block text-xs font-semibold text-slate-300 mb-1.5">Fecha de vencimiento del plan <span class="text-rose-400">*</span></label>
+                            <input type="date" id="endDate" required 
+                                class="w-full px-3 py-2.5 bg-slate-900/90 border border-slate-700/80 rounded-xl text-xs text-white focus:outline-none focus:border-brand-500 focus:ring-1 focus:ring-brand-500 transition">
+                        </div>
+                    </div>
+
+                    <!-- Peso / Altura (opcional, seguimiento físico) -->
+                    <div class="p-4 bg-slate-900/50 rounded-xl border border-slate-800/80 space-y-3">
+                        <span class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block">Peso / Altura (Opcional - Seguimiento físico)</span>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div>
+                                <label for="weight" class="block text-[11px] text-slate-400 mb-1">Peso (kg)</label>
+                                <input type="number" step="0.1" id="weight" placeholder="Ej: 72.5" 
+                                    class="w-full px-3 py-2 bg-slate-900 border border-slate-700/70 rounded-lg text-xs text-white placeholder-slate-600 focus:outline-none focus:border-brand-500">
+                            </div>
+                            <div>
+                                <label for="height" class="block text-[11px] text-slate-400 mb-1">Altura (cm)</label>
+                                <input type="number" id="height" placeholder="Ej: 172" 
+                                    class="w-full px-3 py-2 bg-slate-900 border border-slate-700/70 rounded-lg text-xs text-white placeholder-slate-600 focus:outline-none focus:border-brand-500">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones Guardar y Limpiar -->
+                    <div class="grid grid-cols-2 gap-4 pt-4">
+                        <button type="submit" id="btn-submit" 
+                            class="py-3 px-4 bg-gradient-to-r from-brand-600 to-emerald-500 hover:from-brand-500 hover:to-emerald-400 text-slate-950 font-bold rounded-xl shadow-lg shadow-brand-500/20 active:scale-[0.98] transition duration-150 flex items-center justify-center gap-2 text-xs uppercase tracking-wider cursor-pointer">
+                            <i class="fa-solid fa-floppy-disk text-sm"></i>
+                            <span id="btn-submit-text">Guardar</span>
+                        </button>
+
+                        <button type="button" onclick="resetForm()" 
+                            class="py-3 px-4 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl border border-slate-700 active:scale-[0.98] transition duration-150 flex items-center justify-center gap-2 text-xs uppercase tracking-wider cursor-pointer">
+                            <i class="fa-solid fa-broom text-sm"></i>
+                            <span>Limpiar</span>
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDate').value = today;
+        });
+
+        // Dynamic age calculation
+        function calculateAge() {
+            const birthInput = document.getElementById('birthDate').value;
+            const ageBadge = document.getElementById('computed-age');
+
+            if (!birthInput) {
+                ageBadge.classList.add('hidden');
+                return null;
+            }
+
+            const birthDate = new Date(birthInput);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+
+            if (!isNaN(age) && age >= 0) {
+                ageBadge.textContent = `Edad: ${age} años`;
+                ageBadge.classList.remove('hidden');
+                return age;
+            } else {
+                ageBadge.classList.add('hidden');
+                return null;
+            }
+        }
+
+        // Automatic expiry calculation based on Plan
+        function autoCalculateExpiry() {
+            const startDateVal = document.getElementById('startDate').value;
+            const planVal = document.getElementById('plan').value;
+            const endDateInput = document.getElementById('endDate');
+
+            if (!startDateVal || !planVal) return;
+
+            let date = new Date(startDateVal);
+
+            switch (planVal) {
+                case 'Día':
+                    date.setDate(date.getDate() + 1);
+                    break;
+                case 'Mensual':
+                    date.setMonth(date.getMonth() + 1);
+                    break;
+                case 'Trimestral':
+                    date.setMonth(date.getMonth() + 3);
+                    break;
+                case 'Semestral':
+                    date.setMonth(date.getMonth() + 6);
+                    break;
+                case 'Anual':
+                    date.setFullYear(date.getFullYear() + 1);
+                    break;
+            }
+
+            endDateInput.value = date.toISOString().split('T')[0];
+            
+            // Auto-check for expiry vs current date
+            const todayStr = new Date().toISOString().split('T')[0];
+            if (endDateInput.value < todayStr) {
+                document.getElementById('status').value = 'Vencido';
+            } else if (document.getElementById('status').value === 'Vencido') {
+                document.getElementById('status').value = 'Activo';
+            }
+        }
+
+        // Form Submit Handler conectado a MongoDB
+        async function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const clienteData = {
+                nombre: document.getElementById('fullName').value.trim(),
+                cedula: document.getElementById('idNumber').value.trim(),
+                telefono: document.getElementById('phone').value.trim(),
+                email: document.getElementById('email').value.trim(),
+                fechaNacimiento: document.getElementById('birthDate').value,
+                plan: document.getElementById('plan').value,
+                fechaInscripcion: document.getElementById('startDate').value,
+                fechaVencimiento: document.getElementById('endDate').value,
+                estado: document.getElementById('status').value,
+                peso: document.getElementById('weight').value ? parseFloat(document.getElementById('weight').value) : null,
+                altura: document.getElementById('height').value ? parseFloat(document.getElementById('height').value) : null
+            };
+
+            try {
+                const res = await fetch('http://localhost:3000/api/clientes', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(clienteData)
+                });
+
+                const data = await res.json();
+
+                if (res.ok) {
+                    showToast(`Cliente "${clienteData.nombre}" guardado en MongoDB.`, 'success');
+                    setTimeout(() => { resetForm(); }, 1200);
+                } else {
+                    showToast('Error: ' + (data.error || 'No se pudo guardar'), 'error');
+                }
+            } catch (err) {
+                console.error('Error de conexión:', err);
+                showToast('Error al conectar con el servidor backend', 'error');
+            }
+        }
+
+        // Reset Form ("Limpiar")
+        function resetForm() {
+            document.getElementById('client-form').reset();
+            document.getElementById('client-id').value = '';
+            document.getElementById('computed-age').classList.add('hidden');
+
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('startDate').value = today;
+
+            document.getElementById('form-title').innerHTML = `<i class="fa-solid fa-user-plus text-brand-500"></i><span>Gestión de clientes</span>`;
+            document.getElementById('btn-submit-text').textContent = 'Guardar';
+        }
+
+        // Toast Messages
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const msg = document.getElementById('toast-msg');
+            const icon = document.getElementById('toast-icon');
+
+            msg.textContent = message;
+
+            if (type === 'success') {
+                toast.className = 'mb-6 p-4 rounded-xl text-xs font-medium transition-all duration-300 flex items-center gap-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+                icon.className = 'fa-solid fa-circle-check text-sm';
+            } else if (type === 'error') {
+                toast.className = 'mb-6 p-4 rounded-xl text-xs font-medium transition-all duration-300 flex items-center gap-2 bg-rose-500/10 text-rose-400 border border-rose-500/20';
+                icon.className = 'fa-solid fa-circle-exclamation text-sm';
+            } else {
+                toast.className = 'mb-6 p-4 rounded-xl text-xs font-medium transition-all duration-300 flex items-center gap-2 bg-slate-800 text-slate-300 border border-slate-700';
+                icon.className = 'fa-solid fa-circle-info text-sm';
+            }
+
+            toast.classList.remove('hidden');
+
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 3500);
+        }
+    </script>
 </body>
 </html>
